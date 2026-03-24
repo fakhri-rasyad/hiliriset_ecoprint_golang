@@ -27,6 +27,14 @@ go.work.sum
 # env file
 .env
 
+api_contract.txt
+
+ERD design.jpeg
+
+get.md
+login.md
+README (1).md
+
 # Editor/IDE
 # .idea/
 # .vscode/
