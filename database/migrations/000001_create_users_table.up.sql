@@ -5,7 +5,7 @@ CREATE TABLE users (
     internal_id BIGSERIAL PRIMARY KEY,
     public_id UUID NOT NULL DEFAULT gen_random_uuid(),
     username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password text NOT NULL,
     role VARCHAR(15) NOT NULL DEFAULT 'user',
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
