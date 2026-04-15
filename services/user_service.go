@@ -1,13 +1,16 @@
 package services
 
 import (
+	"errors"
 	"hiliriset_ecoprint_golang/models"
 	"hiliriset_ecoprint_golang/repositories"
+	"hiliriset_ecoprint_golang/utils"
+
+	"github.com/google/uuid"
 )
 
 type UserService interface {
 	CreateUser(*models.User) error
-	FindByEmail(email string) (*models.User, error)
 }
 
 type UserServiceImpl struct{
@@ -19,9 +22,15 @@ func NewUserService(repo repositories.UserRepository) UserService {
 }
 
 func (s *UserServiceImpl) CreateUser(user *models.User) error{
-	return s.userRepo.Create(user)
-}
+	existingUser, _:= s.userRepo.FindByEmail(user.Email)
+	if existingUser.InternalID != 0 {
+		return errors.New("Email telah digunakan, silahkan memakai email baru")
+	}
+	hashedPassword, _ := utils.HashPassword(user.Password)
 
-func (s *UserServiceImpl) FindByEmail(email string) (*models.User, error){
-	return s.userRepo.FindByEmail(email)
+	user.Password = hashedPassword
+	user.Role = "user"
+	user.PublicID = uuid.New()
+
+	return s.userRepo.Create(user)
 }

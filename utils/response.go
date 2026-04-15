@@ -1,0 +1,38 @@
+package utils
+
+import "github.com/gofiber/fiber/v3"
+
+type Response struct {
+	Status     string
+	StatusCode int
+	Message    string
+	Data       interface{}
+	Error      string
+}
+
+func BadRequest(ctx fiber.Ctx, message string, err error) error {
+	return ctx.Status(fiber.StatusBadRequest).JSON(Response{
+		Status: "400 Bad Request",
+		StatusCode: fiber.StatusBadRequest,
+		Message: message,
+		Error: err.Error(),
+	})
+}
+
+func CreationSuccess(ctx fiber.Ctx, message string, data interface{}) error {
+	return ctx.Status(fiber.StatusCreated).JSON(Response{
+		Status: "201 Status Created",
+		StatusCode: fiber.StatusCreated,
+		Message: message,
+		Data: data,
+	})
+}
+
+func SuccessResponse(ctx fiber.Ctx, message string, data interface{}) error {
+	return ctx.Status(fiber.StatusOK).JSON(Response{
+		Status: "200 Status OK",
+		StatusCode: fiber.StatusOK,
+		Message:  message,
+		Data: data,
+	})
+}

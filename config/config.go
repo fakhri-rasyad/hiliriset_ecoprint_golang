@@ -35,6 +35,7 @@ func LoadEnv(){
 	APPConfig = &Config{
 		APPPort: getEnv("PORT", "3000"),
 		DBHost : getEnv("DB_HOST", "localhost"),
+		DBPort: getEnv("DB_PORT", "5432"),
 		DBUser : getEnv("DB_USERNAME", "postrges"),
 		DBPassword : getEnv("DB_PASSWORD", "admin"),
 		DBName : getEnv("DB_NAME", "ecoprint_golang"),
@@ -58,9 +59,9 @@ func getEnv(key, fallback string) string {
 	}
 }
 
-func connectToDB(){
+func ConnectToDB(){
 	cfg := APPConfig
-	dsn := fmt.Sprintf("host=%s post=%s user=%s password=%s dbname=%s sslmode=disable", cfg.DBHost, cfg.APPPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
