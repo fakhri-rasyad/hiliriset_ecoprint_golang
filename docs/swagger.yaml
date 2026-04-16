@@ -9,6 +9,13 @@ definitions:
       role:
         type: string
     type: object
+  models.UserLoginResponse:
+    properties:
+      name:
+        type: string
+      token:
+        type: string
+    type: object
   utils.Response:
     properties:
       data: {}
@@ -38,6 +45,32 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk authentikasi dan verifikasi user
+      parameters:
+      - description: Raw user json data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserDataResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Login user
+      tags:
+      - User
   /v1/auth/register:
     post:
       consumes:

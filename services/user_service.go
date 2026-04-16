@@ -11,6 +11,7 @@ import (
 
 type UserService interface {
 	CreateUser(*models.User) error
+	LoginUser(email, pass string) error
 }
 
 type UserServiceImpl struct{
@@ -33,4 +34,18 @@ func (s *UserServiceImpl) CreateUser(user *models.User) error{
 	user.PublicID = uuid.New()
 
 	return s.userRepo.Create(user)
+}
+
+func (s *UserServiceImpl) LoginUser(email, password string ) error {
+	existingUser, err := s.userRepo.FindByEmail(email)
+
+	if err != nil{
+		return errors.New("Email belum terdaftar")
+	}
+
+	if !utils.CheckPasswordHash(password, existingUser.Password) {
+		return errors.New("Password yang dimasukkan salah")
+	}
+
+	return nil
 }

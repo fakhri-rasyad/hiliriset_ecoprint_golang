@@ -19,4 +19,5 @@ func Setup(
 	}
 
 	app.Post("v1/auth/register", userController.RegisterUser)
+	app.Post("v1/auth/login", userController.LoginUser)
 }

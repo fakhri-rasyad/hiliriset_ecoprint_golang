@@ -24,3 +24,8 @@ type UserDataResponse struct {
 	Email string `json:"email"`
 	Role string `json:"role"`
 }
+
+type UserLoginResponse struct {
+	Username string `json:"name"`
+	BearerToken string `json:"token"`
+}
