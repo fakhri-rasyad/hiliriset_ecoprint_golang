@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"hiliriset_ecoprint_golang/config"
 	"strconv"
 	"time"
@@ -50,3 +51,20 @@ func GenerateToken(username, email string) (string, error){
 
 	return signedToken, nil
 }
+
+func VerifyToken(tokenString string) error {
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
+		return []byte(config.APPConfig.JWTSecret), nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+
+	if err != nil {
+		return err
+	}
+
+	if _, ok := token.Claims.(jwt.MapClaims); !ok {
+		return errors.New("Authentication Failed, Used Invalid Token")
+	}
+
+	return nil
+}
+

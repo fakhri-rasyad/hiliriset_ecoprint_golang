@@ -36,3 +36,12 @@ func SuccessResponse(ctx fiber.Ctx, message string, data interface{}) error {
 		Data: data,
 	})
 }
+
+func UnauthorizedReponse(ctx fiber.Ctx, message string, err error) error {
+	return ctx.Status(fiber.StatusUnauthorized).JSON(Response{
+		Status: "401 Unathorized",
+		StatusCode: fiber.StatusUnauthorized,
+		Message: message,
+		Error: err.Error(),
+	})
+}
