@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	jwtware "github.com/gofiber/contrib/v3/jwt"
+	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -66,5 +68,12 @@ func VerifyToken(tokenString string) error {
 	}
 
 	return nil
+}
+
+func GetEmailClaim(ctx fiber.Ctx) (string, error) {
+	user := jwtware.FromContext(ctx)
+	claims := user.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+	return email, nil
 }
 

@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  models.KomporRequestBody:
+    properties:
+      komporName:
+        type: string
+    type: object
   models.UserDataResponse:
     properties:
       email:
@@ -45,6 +50,54 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /api/v1/kompors:
+    get:
+      description: Mengembalikan daftar kompor pengguna
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.KomporRequestBody'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetKompors
+      tags:
+      - Kompors
+    post:
+      consumes:
+      - application/json
+      description: Menambahkan kompor pengguna
+      parameters:
+      - description: Raw json kompor data
+        in: body
+        name: kompor
+        required: true
+        schema:
+          $ref: '#/definitions/models.KomporRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.KomporRequestBody'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: AddKompor
+      tags:
+      - Kompors
   /v1/auth/login:
     post:
       consumes:
@@ -98,6 +151,9 @@ paths:
       tags:
       - Users
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

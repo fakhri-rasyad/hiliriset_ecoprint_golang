@@ -30,7 +30,10 @@ import (
 // @host      localhost:3000
 // @BasePath  /
 
-// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apiKey  ApiKeyAuth
+// @in							header
+// @name						Authorization
+// @description					Type "Bearer" followed by a space and JWT token.
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
@@ -51,8 +54,12 @@ func main() {
 	userService := services.NewUserService(userRepository)
 	userController := controllers.NewUserController(userService)
 
+	komporRepository := repositories.NewKomporRepository()
+	komporService := services.NewKomporService(userRepository, komporRepository)
+	komporController := controllers.NewKomporController(komporService)
 
-	routes.Setup(app, userController)
+
+	routes.Setup(app, userController, komporController)
 
 	port := config.APPConfig.APPPort
 

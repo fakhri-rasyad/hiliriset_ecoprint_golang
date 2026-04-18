@@ -15,6 +15,7 @@ import (
 func Setup(
 	app *fiber.App,
 	userController controllers.UserController,
+	komporController controllers.KomporController,
 ) {
 	err := godotenv.Load(".env")
 
@@ -38,9 +39,7 @@ func Setup(
 				},
 	}))
 
-	api.Get("/", func (ctx fiber.Ctx) error{
-		return utils.SuccessResponse(ctx, "Token Valid", nil)
-	})
-
+	api.Get("/kompors", komporController.GetKompors)
+	api.Post("/kompors", komporController.AddKompor)
 	
 }
