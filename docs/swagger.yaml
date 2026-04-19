@@ -1,5 +1,21 @@
 basePath: /
 definitions:
+  models.CreateEspRequest:
+    properties:
+      mac_address:
+        type: string
+    required:
+    - mac_address
+    type: object
+  models.EspBase:
+    properties:
+      device_status:
+        type: string
+      mac_address:
+        type: string
+      public_id:
+        type: string
+    type: object
   models.KomporRequestBody:
     properties:
       komporName:
@@ -50,6 +66,92 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /api/v1/esps:
+    get:
+      description: Endpoint untuk mengambil daftar esps pengguna menggunakan email
+        pengguna
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.EspBase'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetEsps
+      tags:
+      - Esps
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk menambahkan esp baru
+      parameters:
+      - description: Raw json body
+        in: body
+        name: esp
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateEspRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.EspBase'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateEsp
+      tags:
+      - Esps
+  /api/v1/esps/{esp_pub_id}:
+    get:
+      description: Endpoint untuk mengambil detail esps menggunakan uuid esp
+      parameters:
+      - description: Public Id ESP
+        in: path
+        name: esp_pub_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.EspBase'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetEspDetail
+      tags:
+      - Esps
   /api/v1/kompors:
     get:
       description: Mengembalikan daftar kompor pengguna

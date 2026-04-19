@@ -19,6 +19,24 @@ func BadRequest(ctx fiber.Ctx, message string, err error) error {
 	})
 }
 
+func NotFound(ctx fiber.Ctx, message string, err error) error {
+	return ctx.Status(fiber.StatusNotFound).JSON(Response{
+		Status: "400 Bad Request",
+		StatusCode: fiber.StatusNotFound,
+		Message: message,
+		Error: err.Error(),
+	})
+}
+
+func InternalError(ctx fiber.Ctx, message string, err error) error{
+	return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
+		Status: "500 Internal Server Error",
+		StatusCode: fiber.StatusInternalServerError,
+		Message: message,
+		Error: err.Error(),
+	})
+}
+
 func CreationSuccess(ctx fiber.Ctx, message string, data interface{}) error {
 	return ctx.Status(fiber.StatusCreated).JSON(Response{
 		Status: "201 Status Created",

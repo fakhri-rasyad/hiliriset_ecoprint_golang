@@ -58,8 +58,12 @@ func main() {
 	komporService := services.NewKomporService(userRepository, komporRepository)
 	komporController := controllers.NewKomporController(komporService)
 
+	espRepository := repositories.NewEspRepository()
+	espService := services.NewEspService(espRepository, userRepository)
+	espController := controllers.NewEspController(espService)
 
-	routes.Setup(app, userController, komporController)
+
+	routes.Setup(app, userController, komporController, espController)
 
 	port := config.APPConfig.APPPort
 

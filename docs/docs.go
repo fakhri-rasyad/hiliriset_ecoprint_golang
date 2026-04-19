@@ -24,6 +24,141 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/esps": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint untuk mengambil daftar esps pengguna menggunakan email pengguna",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Esps"
+                ],
+                "summary": "GetEsps",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.EspBase"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint untuk menambahkan esp baru",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Esps"
+                ],
+                "summary": "CreateEsp",
+                "parameters": [
+                    {
+                        "description": "Raw json body",
+                        "name": "esp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateEspRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.EspBase"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/esps/{esp_pub_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint untuk mengambil detail esps menggunakan uuid esp",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Esps"
+                ],
+                "summary": "GetEspDetail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public Id ESP",
+                        "name": "esp_pub_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.EspBase"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/kompors": {
             "get": {
                 "security": [
@@ -183,6 +318,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.CreateEspRequest": {
+            "type": "object",
+            "required": [
+                "mac_address"
+            ],
+            "properties": {
+                "mac_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.EspBase": {
+            "type": "object",
+            "properties": {
+                "device_status": {
+                    "type": "string"
+                },
+                "mac_address": {
+                    "type": "string"
+                },
+                "public_id": {
+                    "type": "string"
+                }
+            }
+        },
         "models.KomporRequestBody": {
             "type": "object",
             "properties": {

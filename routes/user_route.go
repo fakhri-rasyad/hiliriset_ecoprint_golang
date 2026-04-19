@@ -16,6 +16,7 @@ func Setup(
 	app *fiber.App,
 	userController controllers.UserController,
 	komporController controllers.KomporController,
+	espController controllers.EspController,
 ) {
 	err := godotenv.Load(".env")
 
@@ -41,5 +42,9 @@ func Setup(
 
 	api.Get("/kompors", komporController.GetKompors)
 	api.Post("/kompors", komporController.AddKompor)
+
+	api.Get("/esps", espController.GetEsps)
+	api.Get("/esps/:esp_pub_id", espController.GetEspDetail)
+	api.Post("/esps", espController.CreateEsp)
 	
 }
