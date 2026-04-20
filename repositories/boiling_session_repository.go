@@ -27,6 +27,7 @@ func (r *BoSeRepositoryImpl) CreateSession(userID int64, komporID int64, espID i
         KomporID:   &komporID,
         EspID:      &espID,
         FabricType: fabricType,
+		PublicID: uuid.New(),
     }
 
     if err := config.DB.Create(&gormModel).Error; err != nil {

@@ -27,25 +27,31 @@ func NewUserController(s services.UserService) UserController {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        user body models.UserGorm true "Raw User Json Data"
+// @Param        user body models.UserRegisterRequest true "Data registrasi user"
 // @Success      201  {object}  models.UserDataResponse
 // @Failure      400  {object}  utils.Response
 // @Router       /v1/auth/register [post]
 func (c *UserControllerImpl) RegisterUser(ctx fiber.Ctx) error {
-    var req models.UserGorm
+    var req models.UserRegisterRequest
 
     if err := ctx.Bind().Body(&req); err != nil {
         return utils.BadRequest(ctx, "Error saat parsing data", err)
     }
 
-    if err := c.userService.CreateUser(&req); err != nil {
+    userGorm := models.UserGorm{
+        Username: req.Username,
+        Email:    req.Email,
+        Password: req.Password,
+    }
+
+    if err := c.userService.CreateUser(&userGorm); err != nil {
         return utils.BadRequest(ctx, "Gagal meregistrasikan user", err)
     }
 
     return utils.CreationSuccess(ctx, "Akun user telah dibuat", models.UserDataResponse{
-        Username: req.Username,
-        Email:    req.Email,
-        Role:     req.Role,
+        Username: userGorm.Username,
+        Email:    userGorm.Email,
+        Role:     userGorm.Role,
     })
 }
 
@@ -55,12 +61,12 @@ func (c *UserControllerImpl) RegisterUser(ctx fiber.Ctx) error {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        user body models.UserGorm true "Raw user json data"
+// @Param        user body models.UserLoginRequest true "Data login user"
 // @Success      200  {object}  models.UserLoginResponse
 // @Failure      400  {object}  utils.Response
 // @Router       /v1/auth/login [post]
 func (c *UserControllerImpl) LoginUser(ctx fiber.Ctx) error {
-    var req models.UserGorm
+    var req models.UserLoginRequest
 
     if err := ctx.Bind().Body(&req); err != nil {
         return utils.BadRequest(ctx, "Error saat parsing data", err)

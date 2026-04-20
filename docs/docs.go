@@ -385,12 +385,12 @@ const docTemplate = `{
                 "summary": "Login user",
                 "parameters": [
                     {
-                        "description": "Raw user json data",
+                        "description": "Data login user",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserGorm"
+                            "$ref": "#/definitions/models.UserLoginRequest"
                         }
                     }
                 ],
@@ -425,12 +425,12 @@ const docTemplate = `{
                 "summary": "Register akun user",
                 "parameters": [
                     {
-                        "description": "Raw User Json Data",
+                        "description": "Data registrasi user",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserGorm"
+                            "$ref": "#/definitions/models.UserRegisterRequest"
                         }
                     }
                 ],
@@ -543,28 +543,17 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UserGorm": {
+        "models.UserLoginRequest": {
             "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
-                "internal_id": {
-                    "type": "integer"
-                },
-                "public_id": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }
@@ -574,6 +563,26 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserRegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8
                 },
                 "username": {
                     "type": "string"

@@ -19,6 +19,17 @@ type UserLoginResponse struct {
     BearerToken string `json:"token"`
 }
 
+type UserRegisterRequest struct {
+    Username string `json:"username" validate:"required"`
+    Email    string `json:"email"    validate:"required,email"`
+    Password string `json:"password" validate:"required,min=8"`
+}
+
+type UserLoginRequest struct {
+    Email    string `json:"email"    validate:"required,email"`
+    Password string `json:"password" validate:"required"`
+}
+
 
 type UserBase struct {
     InternalID int64      `json:"internal_id"`

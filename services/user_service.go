@@ -8,6 +8,8 @@ import (
 	"hiliriset_ecoprint_golang/models"
 	"hiliriset_ecoprint_golang/repositories"
 	"hiliriset_ecoprint_golang/utils"
+
+	"github.com/google/uuid"
 )
 
 type UserService interface {
@@ -37,7 +39,7 @@ func (s *UserServiceImpl) CreateUser(req *models.UserGorm) error {
     req.Password = hashedPassword
     req.Role = "user"
 
-    // PublicID and timestamps are handled by Postgres, no need to set manually
+	req.PublicID = uuid.New()
     _, err = s.ur.CreateUser(req)
     return err
 }

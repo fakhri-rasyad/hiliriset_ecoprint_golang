@@ -50,6 +50,7 @@ func (r *KomporRepositoryImpl) AddKompor(req *models.KomporRequest, userID int64
     gormModel := models.KomporGorm{
         KomporName: req.KomporName,
         UserID:     &userID,
+		PublicID: uuid.New(),
     }
 
 	if err := config.DB.Create(&gormModel).Error; err != nil {

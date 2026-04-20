@@ -59,22 +59,15 @@ definitions:
       username:
         type: string
     type: object
-  models.UserGorm:
+  models.UserLoginRequest:
     properties:
-      created_at:
-        type: string
       email:
         type: string
-      internal_id:
-        type: integer
-      public_id:
+      password:
         type: string
-      role:
-        type: string
-      updated_at:
-        type: string
-      username:
-        type: string
+    required:
+    - email
+    - password
     type: object
   models.UserLoginResponse:
     properties:
@@ -82,6 +75,20 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  models.UserRegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
     type: object
   utils.Response:
     properties:
@@ -336,12 +343,12 @@ paths:
       - application/json
       description: Endpoint untuk authentikasi dan verifikasi user
       parameters:
-      - description: Raw user json data
+      - description: Data login user
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserGorm'
+          $ref: '#/definitions/models.UserLoginRequest'
       produces:
       - application/json
       responses:
@@ -362,12 +369,12 @@ paths:
       - application/json
       description: Endpoint untuk mendaftarkan akun user ke sistem
       parameters:
-      - description: Raw User Json Data
+      - description: Data registrasi user
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.UserGorm'
+          $ref: '#/definitions/models.UserRegisterRequest'
       produces:
       - application/json
       responses:

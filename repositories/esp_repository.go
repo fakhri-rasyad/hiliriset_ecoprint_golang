@@ -24,6 +24,7 @@ func (r *EspRepositoryImpl) AddEsp(req *models.CreateEspRequest, userID int64) (
     gormModel := models.EspGorm{
         MacAddress: req.MacAddress,
         UserID:     &userID,
+		PublicID: uuid.New(),
     }
 
     if err := config.DB.Create(&gormModel).Error; err != nil {
