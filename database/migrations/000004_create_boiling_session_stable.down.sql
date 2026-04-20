@@ -1,0 +1,6 @@
+ALTER TABLE boiling_session 
+DROP boiling_session_public_id_unique,
+DROP boiling_session_fk_user_id,
+DROP boiling_session_fk_kompor_id,
+DROP boiling_session_fk_esp_id;
+DROP TABLE boiling_sessions;
