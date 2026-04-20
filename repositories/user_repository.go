@@ -6,23 +6,44 @@ import (
 )
 
 type UserRepository interface {
-	Create(user *models.User) error
-	FindByEmail(email string) (*models.User, error)
+    CreateUser(req *models.UserGorm) (*models.UserBase, error)
+    FindByEmail(email string) (*models.UserBase, error)
+    FindByPublicID(publicID string) (*models.UserBase, error)
 }
 
-type UserRepositoryImpl struct {
-}
+type UserRepositoryImpl struct{}
 
 func NewUserRepository() UserRepository {
-	return &UserRepositoryImpl{}
+    return &UserRepositoryImpl{}
 }
 
-func (r *UserRepositoryImpl) Create(user *models.User) error {
-	return config.DB.Create(user).Error
+func (r *UserRepositoryImpl) CreateUser(req *models.UserGorm) (*models.UserBase, error) {
+    if err := config.DB.Create(req).Error; err != nil {
+        return nil, err
+    }
+
+    base := req.ToBase()
+    return &base, nil
 }
 
-func (r *UserRepositoryImpl) FindByEmail(email string) (*models.User, error) {
-	var user models.User
-	err := config.DB.Where("email = ?", email).First(&user).Error
-	return &user, err
+func (r *UserRepositoryImpl) FindByEmail(email string) (*models.UserBase, error) {
+    var gormModel models.UserGorm
+
+    if err := config.DB.Where("email = ?", email).First(&gormModel).Error; err != nil {
+        return nil, err
+    }
+
+    base := gormModel.ToBase()
+    return &base, nil
+}
+
+func (r *UserRepositoryImpl) FindByPublicID(publicID string) (*models.UserBase, error) {
+    var gormModel models.UserGorm
+
+    if err := config.DB.Where("public_id = ?", publicID).First(&gormModel).Error; err != nil {
+        return nil, err
+    }
+
+    base := gormModel.ToBase()
+    return &base, nil
 }

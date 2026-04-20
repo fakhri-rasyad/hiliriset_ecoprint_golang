@@ -3,45 +3,66 @@ package repositories
 import (
 	"hiliriset_ecoprint_golang/config"
 	"hiliriset_ecoprint_golang/models"
+
+	"github.com/google/uuid"
 )
 
-type EspRepository interface{
-	AddEsp(esps *models.EspGorm) error
-	GetEsps(userId int64) ([]models.EspBase, error)
-	GetEspDetail(espPublicID string)(*models.EspBase, error)
+type EspRepository interface {
+    AddEsp(req *models.CreateEspRequest, userID int64) (*models.EspBase, error)
+    GetEsps(userID int64) ([]models.EspBase, error)
+    GetEspByPublicID(publicID uuid.UUID) (*models.EspBase, error)
+    DeleteEsp(publicID uuid.UUID) error
 }
 
-type EspRepositoryImpl struct {
-}
+type EspRepositoryImpl struct{}
 
 func NewEspRepository() EspRepository {
-	return &EspRepositoryImpl{}
+    return &EspRepositoryImpl{}
 }
 
-func (r *EspRepositoryImpl) AddEsp(esps *models.EspGorm) error {
-	return config.DB.Create(esps).Error
+func (r *EspRepositoryImpl) AddEsp(req *models.CreateEspRequest, userID int64) (*models.EspBase, error) {
+    gormModel := models.EspGorm{
+        MacAddress: req.MacAddress,
+        UserID:     &userID,
+    }
+
+    if err := config.DB.Create(&gormModel).Error; err != nil {
+        return nil, err
+    }
+
+    base := gormModel.ToBase()
+    return &base, nil
 }
 
-func (r *EspRepositoryImpl) GetEsps(userID int64) ([]models.EspBase ,error){
-	var esps []models.EspGorm
-	if err := config.DB.Where("user_id = ?", userID).Find(&esps).Error; err != nil{
-		return nil, err
-	}
+func (r *EspRepositoryImpl) GetEsps(userID int64) ([]models.EspBase, error) {
+    var gormModels []models.EspGorm
 
-	baseEsps := make([]models.EspBase, len(esps))
-	for i, base := range esps{
-		baseEsps[i] = base.EspBase
-	}
+    if err := config.DB.Where("user_id = ?", userID).Find(&gormModels).Error; err != nil {
+        return nil, err
+    }
 
-	return baseEsps, nil
+    result := make([]models.EspBase, len(gormModels))
+    for i, g := range gormModels {
+        result[i] = g.ToBase()
+    }
+
+    return result, nil
 }
 
-func (r *EspRepositoryImpl) GetEspDetail(espPublicId string) (*models.EspBase, error){
-	var esp models.EspGorm
-	if err := config.DB.Where("public_id = ?", espPublicId).First(&esp).Error; err != nil {
-		return nil, err
-	}
-	return &esp.EspBase, nil
+func (r *EspRepositoryImpl) GetEspByPublicID(publicID uuid.UUID) (*models.EspBase, error) {
+    var gormModel models.EspGorm
+
+    if err := config.DB.Where("public_id = ?", publicID).First(&gormModel).Error; err != nil {
+        return nil, err
+    }
+
+    base := gormModel.ToBase()
+    return &base, nil
 }
 
-//Selesaikan
+func (r *EspRepositoryImpl) DeleteEsp(publicID uuid.UUID) error {
+    return config.DB.
+        Where("public_id = ?", publicID).
+        Delete(&models.EspGorm{}).
+        Error
+}

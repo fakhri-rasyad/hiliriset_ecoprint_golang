@@ -3,31 +3,61 @@ package repositories
 import (
 	"hiliriset_ecoprint_golang/config"
 	"hiliriset_ecoprint_golang/models"
+
+	"github.com/google/uuid"
 )
 
 type KomporRepository interface {
-	GetKompor(user_id int) ([]models.Kompors, error)
-	AddKompor(kompor *models.Kompors) error
+    GetKompors(userID int64) ([]models.KomporBase, error)
+    GetKomporByPublicID(publicID uuid.UUID) (*models.KomporBase, error)
+    AddKompor(req *models.KomporRequest, userID int64) error
+    DeleteKompor(publicID uuid.UUID) error
 }
 
-type KomporRepositoryImpl struct {
-}
+type KomporRepositoryImpl struct{}
 
 func NewKomporRepository() KomporRepository {
-	return &KomporRepositoryImpl{}
+    return &KomporRepositoryImpl{}
 }
 
-func (r *KomporRepositoryImpl) GetKompor(userID int) ([]models.Kompors, error){
-	var kompors []models.Kompors
+func (r *KomporRepositoryImpl) GetKompors(userID int64) ([]models.KomporBase, error) {
+    var gormModels []models.KomporGorm
 
-	if err := config.DB.Where("user_id = ?", userID).Find(&kompors).Error; err != nil {
-		return nil, err
-	}
+    if err := config.DB.Where("user_id = ?", userID).Find(&gormModels).Error; err != nil {
+        return nil, err
+    }
 
-	return kompors, nil
+    result := make([]models.KomporBase, len(gormModels))
+    for i, g := range gormModels {
+        result[i] = g.ToBase()
+    }
+
+    return result, nil
 }
 
+func (r *KomporRepositoryImpl) GetKomporByPublicID(publicID uuid.UUID) (*models.KomporBase, error) {
+    var gormModel models.KomporGorm
 
-func (r *KomporRepositoryImpl) AddKompor(kompor *models.Kompors) error{
-	return config.DB.Create(kompor).Error
+    if err := config.DB.Where("public_id = ?", publicID).First(&gormModel).Error; err != nil {
+        return nil, err
+    }
+
+    base := gormModel.ToBase()
+    return &base, nil
+}
+
+func (r *KomporRepositoryImpl) AddKompor(req *models.KomporRequest, userID int64) error {
+    gormModel := models.KomporGorm{
+        KomporName: req.KomporName,
+        UserID:     &userID,
+    }
+
+    return config.DB.Create(&gormModel).Error
+}
+
+func (r *KomporRepositoryImpl) DeleteKompor(publicID uuid.UUID) error {
+    return config.DB.
+        Where("public_id = ?", publicID).
+        Delete(&models.KomporGorm{}).
+        Error
 }
