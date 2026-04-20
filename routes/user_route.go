@@ -13,38 +13,36 @@ import (
 )
 
 func Setup(
-	app *fiber.App,
-	userController controllers.UserController,
-	komporController controllers.KomporController,
-	espController controllers.EspController,
+    app *fiber.App,
+    userController controllers.UserController,
+    komporController controllers.KomporController,
+    espController controllers.EspController,
 ) {
-	err := godotenv.Load(".env")
+    err := godotenv.Load(".env")
+    if err != nil {
+        log.Fatal("Gagal membuka file .env")
+    }
 
-	if err != nil {
-		log.Fatal("Gagal membuka file .env")
-	}
+    auth := app.Group("/v1/auth")
+    auth.Post("/register", userController.RegisterUser)
+    auth.Post("/login", userController.LoginUser)
 
-	app.Post("v1/auth/register", userController.RegisterUser)
-	app.Post("v1/auth/login", userController.LoginUser)
+    api := app.Group("/api/v1")
+    api.Use(jwtware.New(jwtware.Config{
+        SigningKey: jwtware.SigningKey{Key: []byte(config.APPConfig.JWTSecret)},
+        Extractor: extractors.FromAuthHeader("Bearer"),
+        ErrorHandler: func(c fiber.Ctx, err error) error {
+            return utils.UnauthorizedReponse(c, "User unauthorized", err)
+        },
+    }))
 
-	
+    api.Get("/kompors", komporController.GetKompors)
+    api.Post("/kompors", komporController.AddKompor)
+    api.Get("/kompors/:public_id", komporController.GetKomporByPublicID)
+    api.Delete("/kompors/:public_id", komporController.DeleteKompor)
 
-	api := app.Group("/api/v1")
-	api.Use(
-		jwtware.New(
-			jwtware.Config{
-				SigningKey: jwtware.SigningKey{Key: []byte(config.APPConfig.JWTSecret)},
-				Extractor: extractors.FromAuthHeader("Bearer"),
-				ErrorHandler: func (c fiber.Ctx, err error) error {
-					return utils.UnauthorizedReponse(c, "User unathorized", err)
-				},
-	}))
-
-	api.Get("/kompors", komporController.GetKompors)
-	api.Post("/kompors", komporController.AddKompor)
-
-	api.Get("/esps", espController.GetEsps)
-	api.Get("/esps/:esp_pub_id", espController.GetEspDetail)
-	api.Post("/esps", espController.CreateEsp)
-	
+    api.Get("/esps", espController.GetEsps)
+    api.Post("/esps", espController.CreateEsp)
+    api.Get("/esps/:public_id", espController.GetEspByPublicID)
+    api.Delete("/esps/:public_id", espController.DeleteEsp)
 }

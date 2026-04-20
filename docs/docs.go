@@ -31,7 +31,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Endpoint untuk mengambil daftar esps pengguna menggunakan email pengguna",
+                "description": "Endpoint untuk mengambil daftar esps pengguna",
                 "produces": [
                     "application/json"
                 ],
@@ -113,26 +113,26 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/esps/{esp_pub_id}": {
+        "/api/v1/esps/{public_id}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Endpoint untuk mengambil detail esps menggunakan uuid esp",
+                "description": "Endpoint untuk mengambil detail esp menggunakan public id",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Esps"
                 ],
-                "summary": "GetEspDetail",
+                "summary": "GetEspByPublicID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Public Id ESP",
-                        "name": "esp_pub_id",
+                        "description": "Public ID ESP",
+                        "name": "public_id",
                         "in": "path",
                         "required": true
                     }
@@ -144,14 +144,58 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.EspBase"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
                     "404": {
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.Response"
                         }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint untuk menghapus esp menggunakan public id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Esps"
+                ],
+                "summary": "DeleteEsp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID ESP",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.Response"
                         }
@@ -180,7 +224,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.KomporRequestBody"
+                                "$ref": "#/definitions/models.KomporBase"
                             }
                         }
                     },
@@ -216,7 +260,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.KomporRequestBody"
+                            "$ref": "#/definitions/models.KomporRequest"
                         }
                     }
                 ],
@@ -224,11 +268,101 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.KomporRequestBody"
+                            "$ref": "#/definitions/models.KomporBase"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/kompors/{public_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil detail kompor berdasarkan public id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kompors"
+                ],
+                "summary": "GetKomporByPublicID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Kompor",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.KomporBase"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Menghapus kompor berdasarkan public id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kompors"
+                ],
+                "summary": "DeleteKompor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Kompor",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.Response"
                         }
@@ -246,7 +380,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User"
+                    "Users"
                 ],
                 "summary": "Login user",
                 "parameters": [
@@ -256,7 +390,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserDataResponse"
+                            "$ref": "#/definitions/models.UserGorm"
                         }
                     }
                 ],
@@ -296,7 +430,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UserDataResponse"
+                            "$ref": "#/definitions/models.UserGorm"
                         }
                     }
                 ],
@@ -332,21 +466,65 @@ const docTemplate = `{
         "models.EspBase": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "device_status": {
                     "type": "string"
+                },
+                "internal_id": {
+                    "type": "integer"
                 },
                 "mac_address": {
                     "type": "string"
                 },
                 "public_id": {
                     "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
-        "models.KomporRequestBody": {
+        "models.KomporBase": {
             "type": "object",
             "properties": {
-                "komporName": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "internal_id": {
+                    "type": "integer"
+                },
+                "kompor_name": {
+                    "type": "string"
+                },
+                "public_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.KomporRequest": {
+            "type": "object",
+            "required": [
+                "kompor_name"
+            ],
+            "properties": {
+                "kompor_name": {
                     "type": "string"
                 }
             }
@@ -357,10 +535,36 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "name": {
+                "role": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserGorm": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "internal_id": {
+                    "type": "integer"
+                },
+                "public_id": {
                     "type": "string"
                 },
                 "role": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -368,10 +572,10 @@ const docTemplate = `{
         "models.UserLoginResponse": {
             "type": "object",
             "properties": {
-                "name": {
+                "token": {
                     "type": "string"
                 },
-                "token": {
+                "username": {
                     "type": "string"
                 }
             }
