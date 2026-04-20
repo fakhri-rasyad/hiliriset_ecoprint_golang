@@ -19,9 +19,18 @@ func BadRequest(ctx fiber.Ctx, message string, err error) error {
 	})
 }
 
+func Unauthorized(ctx fiber.Ctx, message string, err error) error {
+	return ctx.Status(fiber.StatusUnauthorized).JSON(Response{
+		Status: "401 Unathorized",
+		StatusCode: fiber.StatusUnauthorized,
+		Message: message,
+		Error: err.Error(),
+	})
+}
+
 func NotFound(ctx fiber.Ctx, message string, err error) error {
 	return ctx.Status(fiber.StatusNotFound).JSON(Response{
-		Status: "400 Bad Request",
+		Status: "404 Not Found",
 		StatusCode: fiber.StatusNotFound,
 		Message: message,
 		Error: err.Error(),
