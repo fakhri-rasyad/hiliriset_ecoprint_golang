@@ -1,3 +1,6 @@
+// ========================================================
+// user_service.go
+// ========================================================
 package services
 
 import (
@@ -5,47 +8,49 @@ import (
 	"hiliriset_ecoprint_golang/models"
 	"hiliriset_ecoprint_golang/repositories"
 	"hiliriset_ecoprint_golang/utils"
-
-	"github.com/google/uuid"
 )
 
 type UserService interface {
-	CreateUser(*models.User) error
-	LoginUser(email, pass string) error
+    CreateUser(req *models.UserGorm) error
+    LoginUser(email, password string) (*models.UserBase, error)
 }
 
-type UserServiceImpl struct{
-	userRepo repositories.UserRepository
+type UserServiceImpl struct {
+    ur repositories.UserRepository
 }
 
-func NewUserService(repo repositories.UserRepository) UserService {
-	return &UserServiceImpl{userRepo: repo}
+func NewUserService(ur repositories.UserRepository) UserService {
+    return &UserServiceImpl{ur: ur}
 }
 
-func (s *UserServiceImpl) CreateUser(user *models.User) error{
-	existingUser, _:= s.userRepo.FindByEmail(user.Email)
-	if existingUser.InternalID != 0 {
-		return errors.New("Email telah digunakan, silahkan memakai email baru")
-	}
-	hashedPassword, _ := utils.HashPassword(user.Password)
+func (s *UserServiceImpl) CreateUser(req *models.UserGorm) error {
+    existing, _ := s.ur.FindByEmail(req.Email)
+    if existing != nil && existing.InternalID != 0 {
+        return errors.New("email telah digunakan, silahkan memakai email baru")
+    }
 
-	user.Password = hashedPassword
-	user.Role = "user"
-	user.PublicID = uuid.New()
+    hashedPassword, err := utils.HashPassword(req.Password)
+    if err != nil {
+        return err
+    }
 
-	return s.userRepo.Create(user)
+    req.Password = hashedPassword
+    req.Role = "user"
+
+    // PublicID and timestamps are handled by Postgres, no need to set manually
+    _, err = s.ur.CreateUser(req)
+    return err
 }
 
-func (s *UserServiceImpl) LoginUser(email, password string ) error {
-	existingUser, err := s.userRepo.FindByEmail(email)
+func (s *UserServiceImpl) LoginUser(email, password string) (*models.UserBase, error) {
+    existingUser, err := s.ur.FindByEmail(email)
+    if err != nil {
+        return nil, errors.New("email belum terdaftar")
+    }
 
-	if err != nil{
-		return errors.New("Email belum terdaftar")
-	}
+    if !utils.CheckPasswordHash(password, existingUser.Password) {
+        return nil, errors.New("password yang dimasukkan salah")
+    }
 
-	if !utils.CheckPasswordHash(password, existingUser.Password) {
-		return errors.New("Password yang dimasukkan salah")
-	}
-
-	return nil
+    return existingUser, nil
 }

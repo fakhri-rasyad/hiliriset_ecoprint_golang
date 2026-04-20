@@ -1,6 +1,3 @@
-// ========================================================
-// user.go
-// ========================================================
 package models
 
 import (
@@ -10,7 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// --- Request / Response ---
 
 type UserDataResponse struct {
     Username string `json:"username"`
@@ -23,21 +19,19 @@ type UserLoginResponse struct {
     BearerToken string `json:"token"`
 }
 
-// --- Base (service/business logic layer) ---
 
 type UserBase struct {
     InternalID int64      `json:"internal_id"`
     PublicID   uuid.UUID  `json:"public_id"`
     Username   string     `json:"username"`
     Email      string     `json:"email"`
-    Password   string     `json:"-"`          // never expose in JSON
+    Password   string     `json:"-"`         
     Role       string     `json:"role"`
     CreatedAt  time.Time  `json:"created_at"`
     UpdatedAt  time.Time  `json:"updated_at"`
     DeletedAt  *time.Time `json:"deleted_at"`
 }
 
-// --- GORM (repository/database layer) ---
 
 type UserGorm struct {
     InternalID int64          `json:"internal_id" db:"internal_id" gorm:"column:internal_id;primaryKey;autoIncrement"`

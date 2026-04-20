@@ -10,7 +10,7 @@ import (
 type KomporRepository interface {
     GetKompors(userID int64) ([]models.KomporBase, error)
     GetKomporByPublicID(publicID uuid.UUID) (*models.KomporBase, error)
-    AddKompor(req *models.KomporRequest, userID int64) error
+    AddKompor(req *models.KomporRequest, userID int64)(*models.KomporBase, error)
     DeleteKompor(publicID uuid.UUID) error
 }
 
@@ -46,13 +46,19 @@ func (r *KomporRepositoryImpl) GetKomporByPublicID(publicID uuid.UUID) (*models.
     return &base, nil
 }
 
-func (r *KomporRepositoryImpl) AddKompor(req *models.KomporRequest, userID int64) error {
+func (r *KomporRepositoryImpl) AddKompor(req *models.KomporRequest, userID int64) (*models.KomporBase, error) {
     gormModel := models.KomporGorm{
         KomporName: req.KomporName,
         UserID:     &userID,
     }
 
-    return config.DB.Create(&gormModel).Error
+	if err := config.DB.Create(&gormModel).Error; err != nil {
+		return nil, err
+	}
+
+	baseModel := gormModel.ToBase()
+
+    return &baseModel, nil
 }
 
 func (r *KomporRepositoryImpl) DeleteKompor(publicID uuid.UUID) error {

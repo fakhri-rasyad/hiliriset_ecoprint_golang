@@ -7,66 +7,49 @@ import (
 	"github.com/google/uuid"
 )
 
-type EspService interface{
-	AddNewEsps(userEmail string, espData *models.CreateEspRequest) (*models.EspBase, error)
-	GetEspDetail(espPubID string) (*models.EspBase, error)
-	GetEsps(userEmail string)([]models.EspBase, error)
+type EspService interface {
+    AddEsp(userEmail string, req *models.CreateEspRequest) (*models.EspBase, error)
+    GetEsps(userEmail string) ([]models.EspBase, error)
+    GetEspByPublicID(publicID uuid.UUID) (*models.EspBase, error)
+    DeleteEsp(publicID uuid.UUID) error
 }
 
 type EspServiceImpl struct {
-	er repositories.EspRepository
-	ur repositories.UserRepository
+    er repositories.EspRepository
+    ur repositories.UserRepository
 }
 
-func NewEspService(er repositories.EspRepository, ur repositories.UserRepository ) EspService{
-	return &EspServiceImpl{er, ur}
+func NewEspService(er repositories.EspRepository, ur repositories.UserRepository) EspService {
+    return &EspServiceImpl{er, ur}
 }
 
-func (s *EspServiceImpl) AddNewEsps(userEmail string, espData *models.CreateEspRequest) (*models.EspBase, error) {
-	existingUser, err := s.ur.FindByEmail(userEmail)
-	if err != nil {
-		return nil, err
-	} 
-	
-	newEsp := &models.EspGorm{
-		UserID: existingUser.InternalID,
-		EspBase: models.EspBase{
-			PublicID: uuid.New(),
-			MacAddress: espData.MacAddress,
-			DeviceStatus: "offline",
-		},
-	} 
+func (s *EspServiceImpl) AddEsp(userEmail string, req *models.CreateEspRequest) (*models.EspBase, error) {
+    existingUser, err := s.ur.FindByEmail(userEmail)
+    if err != nil {
+        return nil, err
+    }
 
-	if err := s.er.AddEsp(newEsp); err != nil {
-		return nil, err
-	}
-
-	return &newEsp.EspBase, nil
+    return s.er.AddEsp(req, existingUser.InternalID)
 }
 
-func (s *EspServiceImpl) GetEspDetail(espPubID string) (*models.EspBase, error) {
-	espData, err := s.er.GetEspDetail(espPubID)
+func (s *EspServiceImpl) GetEsps(userEmail string) ([]models.EspBase, error) {
+    existingUser, err := s.ur.FindByEmail(userEmail)
+    if err != nil {
+        return nil, err
+    }
 
-	if err != nil {
-		return nil, err
-	}
-
-	return espData, nil
+    return s.er.GetEsps(existingUser.InternalID)
 }
 
-func (s *EspServiceImpl) GetEsps(userEmail string)([]models.EspBase, error){
-	existingUser, err := s.ur.FindByEmail(userEmail)
+func (s *EspServiceImpl) GetEspByPublicID(publicID uuid.UUID) (*models.EspBase, error) {
+    return s.er.GetEspByPublicID(publicID)
+}
 
-	if err != nil {
-		return nil, err
-	}
+func (s *EspServiceImpl) DeleteEsp(publicID uuid.UUID) error {
+    _, err := s.er.GetEspByPublicID(publicID)
+    if err != nil {
+        return err
+    }
 
-	esps, err := s.er.GetEsps(existingUser.InternalID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return esps, nil
-
+    return s.er.DeleteEsp(publicID)
 }
