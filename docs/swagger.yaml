@@ -1,5 +1,44 @@
 basePath: /
 definitions:
+  models.BoilingSessionCreation:
+    properties:
+      esp_public_id:
+        type: string
+      fabric_type:
+        type: string
+      kompor_public_id:
+        type: string
+    required:
+    - esp_public_id
+    - fabric_type
+    - kompor_public_id
+    type: object
+  models.BoilingSessionResponse:
+    properties:
+      boiling_status:
+        type: string
+      created_at:
+        type: string
+      esp_id:
+        type: integer
+      fabric_type:
+        type: string
+      finished_at:
+        type: string
+      kompor_id:
+        type: integer
+      public_id:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.BoilingSessionStatusUpdate:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
   models.CreateEspRequest:
     properties:
       mac_address:
@@ -337,6 +376,157 @@ paths:
       summary: GetKomporByPublicID
       tags:
       - Kompors
+  /api/v1/sessions:
+    get:
+      description: Mengembalikan daftar sesi perebusan pengguna
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BoilingSessionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetSessions
+      tags:
+      - BoisingSessions
+    post:
+      consumes:
+      - application/json
+      description: Membuat sesi perebusan baru
+      parameters:
+      - description: Data sesi perebusan
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/models.BoilingSessionCreation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.BoilingSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateSession
+      tags:
+      - BoisingSessions
+  /api/v1/sessions/{public_id}:
+    get:
+      description: Mengambil detail sesi perebusan berdasarkan public id
+      parameters:
+      - description: Public ID Sesi
+        in: path
+        name: public_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BoilingSessionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetSessionByPublicID
+      tags:
+      - BoisingSessions
+  /api/v1/sessions/{public_id}/finish:
+    patch:
+      description: Menyelesaikan sesi perebusan
+      parameters:
+      - description: Public ID Sesi
+        in: path
+        name: public_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: FinishSession
+      tags:
+      - BoisingSessions
+  /api/v1/sessions/{public_id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Memperbarui status sesi perebusan
+      parameters:
+      - description: Public ID Sesi
+        in: path
+        name: public_id
+        required: true
+        type: string
+      - description: Status baru sesi
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.BoilingSessionStatusUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateSessionStatus
+      tags:
+      - BoisingSessions
   /v1/auth/login:
     post:
       consumes:

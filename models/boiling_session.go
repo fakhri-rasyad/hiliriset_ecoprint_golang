@@ -6,18 +6,54 @@ import (
 	"github.com/google/uuid"
 )
 
-type BoilingSessionBase struct {
-    InternalID    int64     `json:"internal_id"`
-    PublicID      uuid.UUID `json:"public_id"`
-    BoilingStatus string    `json:"boiling_status"`
-    FabricType    string    `json:"fabric_type"`
-    UserID        *int64    `json:"user_id"`
-    KomporID      *int64    `json:"kompor_id"`
-    EspID         *int64    `json:"esp_id"`
-    CreatedAt     time.Time `json:"created_at"`
+type BoilingSessionCreation struct {
+    KomporPublicID uuid.UUID `json:"kompor_public_id" validate:"required"`
+    EspPublicID    uuid.UUID `json:"esp_public_id"    validate:"required"`
+    FabricType     string    `json:"fabric_type" validate:"required"`
+}
+
+
+type BoilingSessionResponse struct {
+    PublicID      uuid.UUID  `json:"public_id"`
+    BoilingStatus string     `json:"boiling_status"`
+    FabricType    string     `json:"fabric_type"`
+    UserID        *int64     `json:"user_id"`
+    KomporID      *int64     `json:"kompor_id"`
+    EspID         *int64     `json:"esp_id"`
+    CreatedAt     time.Time  `json:"created_at"`
     FinishedAt    *time.Time `json:"finished_at"`
-    UpdatedAt     time.Time `json:"updated_at"`
+}
+
+
+type BoilingSessionBase struct {
+    InternalID    int64      `json:"internal_id"`
+    PublicID      uuid.UUID  `json:"public_id"`
+    BoilingStatus string     `json:"boiling_status"`
+    FabricType    string     `json:"fabric_type"`
+    UserID        *int64     `json:"user_id"`
+    KomporID      *int64     `json:"kompor_id"`
+    EspID         *int64     `json:"esp_id"`
+    CreatedAt     time.Time  `json:"created_at"`
+    FinishedAt    *time.Time `json:"finished_at"`
+    UpdatedAt     time.Time  `json:"updated_at"`
     DeletedAt     *time.Time `json:"deleted_at"`
+}
+
+func (b BoilingSessionBase) ToResponse() BoilingSessionResponse {
+    return BoilingSessionResponse{
+        PublicID:      b.PublicID,
+        BoilingStatus: b.BoilingStatus,
+        FabricType:    b.FabricType,
+        UserID:        b.UserID,
+        KomporID:      b.KomporID,
+        EspID:         b.EspID,
+        CreatedAt:     b.CreatedAt,
+        FinishedAt:    b.FinishedAt,
+    }
+}
+
+type BoilingSessionStatusUpdate struct {
+    Status string `json:"status" validate:"required"`
 }
 
 type BoilingSession struct {
@@ -34,9 +70,7 @@ type BoilingSession struct {
     DeletedAt     *time.Time `json:"deleted_at"     db:"deleted_at"     gorm:"column:deleted_at;index"`
 }
 
-func (BoilingSession) TableName() string {
-    return "boiling_sessions"
-}
+func (BoilingSession) TableName() string { return "boiling_sessions" }
 
 func (bs BoilingSession) ToBase() BoilingSessionBase {
     return BoilingSessionBase{
@@ -52,18 +86,4 @@ func (bs BoilingSession) ToBase() BoilingSessionBase {
         UpdatedAt:     bs.UpdatedAt,
         DeletedAt:     bs.DeletedAt,
     }
-}
-
-func (bs *BoilingSession) FromBase(b BoilingSessionBase) {
-    bs.InternalID    = b.InternalID
-    bs.PublicID      = b.PublicID
-    bs.BoilingStatus = b.BoilingStatus
-    bs.FabricType    = b.FabricType
-    bs.UserID        = b.UserID
-    bs.KomporID      = b.KomporID
-    bs.EspID         = b.EspID
-    bs.CreatedAt     = b.CreatedAt
-    bs.FinishedAt    = b.FinishedAt
-    bs.UpdatedAt     = b.UpdatedAt
-    bs.DeletedAt     = b.DeletedAt
 }

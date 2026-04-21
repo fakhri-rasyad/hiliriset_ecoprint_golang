@@ -1,3 +1,6 @@
+// ========================================================
+// repositories/bose_repository.go
+// ========================================================
 package repositories
 
 import (
@@ -23,11 +26,11 @@ func NewBoSeRepository() BoSeRepository {
 
 func (r *BoSeRepositoryImpl) CreateSession(userID int64, komporID int64, espID int64, fabricType string) (*models.BoilingSessionBase, error) {
     gormModel := models.BoilingSession{
+        PublicID:   uuid.New(),
         UserID:     &userID,
         KomporID:   &komporID,
         EspID:      &espID,
         FabricType: fabricType,
-		PublicID: uuid.New(),
     }
 
     if err := config.DB.Create(&gormModel).Error; err != nil {

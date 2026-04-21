@@ -17,6 +17,7 @@ func Setup(
     userController controllers.UserController,
     komporController controllers.KomporController,
     espController controllers.EspController,
+    boSeController controllers.BoSeController,
 ) {
     err := godotenv.Load(".env")
     if err != nil {
@@ -45,4 +46,10 @@ func Setup(
     api.Post("/esps", espController.CreateEsp)
     api.Get("/esps/:public_id", espController.GetEspByPublicID)
     api.Delete("/esps/:public_id", espController.DeleteEsp)
+
+    api.Post("/sessions", boSeController.CreateSession)
+    api.Get("/sessions", boSeController.GetSessions)
+    api.Get("/sessions/:public_id", boSeController.GetSessionByPublicID)
+    api.Patch("/sessions/:public_id/status", boSeController.UpdateSessionStatus)
+    api.Patch("/sessions/:public_id/finish", boSeController.FinishSession)
 }

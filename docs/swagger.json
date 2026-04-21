@@ -364,6 +364,245 @@
                 }
             }
         },
+        "/api/v1/sessions": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengembalikan daftar sesi perebusan pengguna",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "GetSessions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BoilingSessionResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Membuat sesi perebusan baru",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "CreateSession",
+                "parameters": [
+                    {
+                        "description": "Data sesi perebusan",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BoilingSessionCreation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.BoilingSessionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sessions/{public_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil detail sesi perebusan berdasarkan public id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "GetSessionByPublicID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Sesi",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BoilingSessionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sessions/{public_id}/finish": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Menyelesaikan sesi perebusan",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "FinishSession",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Sesi",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sessions/{public_id}/status": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Memperbarui status sesi perebusan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "UpdateSessionStatus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Sesi",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Status baru sesi",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BoilingSessionStatusUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/auth/login": {
             "post": {
                 "description": "Endpoint untuk authentikasi dan verifikasi user",
@@ -446,6 +685,65 @@
         }
     },
     "definitions": {
+        "models.BoilingSessionCreation": {
+            "type": "object",
+            "required": [
+                "esp_public_id",
+                "fabric_type",
+                "kompor_public_id"
+            ],
+            "properties": {
+                "esp_public_id": {
+                    "type": "string"
+                },
+                "fabric_type": {
+                    "type": "string"
+                },
+                "kompor_public_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BoilingSessionResponse": {
+            "type": "object",
+            "properties": {
+                "boiling_status": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "esp_id": {
+                    "type": "integer"
+                },
+                "fabric_type": {
+                    "type": "string"
+                },
+                "finished_at": {
+                    "type": "string"
+                },
+                "kompor_id": {
+                    "type": "integer"
+                },
+                "public_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BoilingSessionStatusUpdate": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateEspRequest": {
             "type": "object",
             "required": [
