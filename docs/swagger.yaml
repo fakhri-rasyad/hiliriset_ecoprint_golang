@@ -89,6 +89,32 @@ definitions:
     required:
     - kompor_name
     type: object
+  models.SessionRecordInput:
+    properties:
+      air_temp:
+        type: number
+      humidity:
+        type: number
+      session_pub_id:
+        type: string
+      water_temp:
+        type: number
+    type: object
+  models.SessionRecordOutput:
+    properties:
+      air_temp:
+        type: number
+      created_at:
+        type: string
+      humidity:
+        type: number
+      public_id:
+        type: string
+      session_id:
+        type: integer
+      water_temp:
+        type: number
+    type: object
   models.UserDataResponse:
     properties:
       email:
@@ -376,6 +402,35 @@ paths:
       summary: GetKomporByPublicID
       tags:
       - Kompors
+  /api/v1/records/{record_id}:
+    get:
+      description: Mengambil detail satu record berdasarkan public id
+      parameters:
+      - description: Public ID record
+        in: path
+        name: record_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SessionRecordOutput'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetRecordByPubID
+      tags:
+      - SessionRecords
   /api/v1/sessions:
     get:
       description: Mengembalikan daftar sesi perebusan pengguna
@@ -490,6 +545,37 @@ paths:
       summary: FinishSession
       tags:
       - BoisingSessions
+  /api/v1/sessions/{public_id}/records:
+    get:
+      description: Mengemambil record telemetry untuk session
+      parameters:
+      - description: Public ID Sesi
+        in: path
+        name: public_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/utils.Response'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetSessionRecords
+      tags:
+      - BoisingSessions
   /api/v1/sessions/{public_id}/status:
     patch:
       consumes:
@@ -527,6 +613,69 @@ paths:
       summary: UpdateSessionStatus
       tags:
       - BoisingSessions
+  /api/v1/sessions/{session_id}/records:
+    get:
+      description: Mengambil semua records berdasarkan session
+      parameters:
+      - description: Public ID session
+        in: path
+        name: session_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.SessionRecordOutput'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetRecords
+      tags:
+      - SessionRecords
+  /sessions/{session_id}/records:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint pengujian untuk simulasi data sensor dari ESP. Hapus sebelum
+        production.
+      parameters:
+      - description: Public ID session
+        in: path
+        name: session_id
+        required: true
+        type: string
+      - description: Data sensor
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.SessionRecordInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: '[TEST ONLY] CreateRecord'
+      tags:
+      - SessionRecords
   /v1/auth/login:
     post:
       consumes:

@@ -15,14 +15,16 @@ type BoSeController interface {
     GetSessionByPublicID(ctx fiber.Ctx) error
     UpdateSessionStatus(ctx fiber.Ctx) error
     FinishSession(ctx fiber.Ctx) error
+    GetSessionRecords(ctx fiber.Ctx) error
 }
 
 type BoSeControllerImpl struct {
     s services.BoSeService
+    rs services.SessionRecordService
 }
 
-func NewBoSeController(s services.BoSeService) BoSeController {
-    return &BoSeControllerImpl{s: s}
+func NewBoSeController(s services.BoSeService, rs services.SessionRecordService) BoSeController {
+    return &BoSeControllerImpl{s: s, rs: rs}
 }
 
 // CreateSession godoc
@@ -158,4 +160,30 @@ func (c *BoSeControllerImpl) FinishSession(ctx fiber.Ctx) error {
     }
 
     return utils.SuccessResponse(ctx, "Sukses menyelesaikan sesi", nil)
+}
+
+// GetSessionRecords godoc
+// @Summary      GetSessionRecords
+// @Description  Mengemambil record telemetry untuk session
+// @Tags         BoisingSessions
+// @Produce      json
+// @Param        public_id path string true "Public ID Sesi"
+// @Success      200  {object}  []utils.Response
+// @Failure      400  {object}  utils.Response
+// @Failure      404  {object}  utils.Response
+// @Security     ApiKeyAuth
+// @Router       /api/v1/sessions/{public_id}/records [get]
+func (c *BoSeControllerImpl) GetSessionRecords(ctx fiber.Ctx) error {
+    publicID, err := uuid.Parse(ctx.Params("public_id"))
+    if err != nil {
+        return utils.BadRequest(ctx, "Format public_id tidak valid", err)
+    }
+
+    sessionRecords, err := c.rs.GetRecords(publicID)
+
+    if err != nil {
+      return utils.BadRequest(ctx, "Gagal mengambil records", err)
+    }
+
+    return utils.SuccessResponse(ctx, "Sukses mengambil daftar records", sessionRecords)
 }

@@ -370,6 +370,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/records/{record_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil detail satu record berdasarkan public id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SessionRecords"
+                ],
+                "summary": "GetRecordByPubID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID record",
+                        "name": "record_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SessionRecordOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/sessions": {
             "get": {
                 "security": [
@@ -551,6 +597,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/sessions/{public_id}/records": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengemambil record telemetry untuk session",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BoisingSessions"
+                ],
+                "summary": "GetSessionRecords",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID Sesi",
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/utils.Response"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/sessions/{public_id}/status": {
             "patch": {
                 "security": [
@@ -602,6 +697,102 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sessions/{session_id}/records": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil semua records berdasarkan session",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SessionRecords"
+                ],
+                "summary": "GetRecords",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID session",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.SessionRecordOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions/{session_id}/records": {
+            "post": {
+                "description": "Endpoint pengujian untuk simulasi data sensor dari ESP. Hapus sebelum production.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SessionRecords"
+                ],
+                "summary": "[TEST ONLY] CreateRecord",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID session",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data sensor",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SessionRecordInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.Response"
                         }
@@ -824,6 +1015,46 @@ const docTemplate = `{
             "properties": {
                 "kompor_name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.SessionRecordInput": {
+            "type": "object",
+            "properties": {
+                "air_temp": {
+                    "type": "number"
+                },
+                "humidity": {
+                    "type": "number"
+                },
+                "session_pub_id": {
+                    "type": "string"
+                },
+                "water_temp": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.SessionRecordOutput": {
+            "type": "object",
+            "properties": {
+                "air_temp": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "humidity": {
+                    "type": "number"
+                },
+                "public_id": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "integer"
+                },
+                "water_temp": {
+                    "type": "number"
                 }
             }
         },

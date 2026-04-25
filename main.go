@@ -62,12 +62,17 @@ func main() {
 	espService := services.NewEspService(espRepository, userRepository)
 	espController := controllers.NewEspController(espService)
 
+
 	boSeRepository := repositories.NewBoSeRepository()
+  seReRepository := repositories.NewSeReRepository()
+
 	boSeService := services.NewBoSeService(boSeRepository, userRepository, komporRepository, espRepository)
-	boSeController := controllers.NewBoSeController(boSeService)
+  seReService := services.NewSessionRecordService(seReRepository, boSeRepository)
 
+	boSeController := controllers.NewBoSeController(boSeService, seReService)
+  seReController := controllers.NewSessionRecordController(seReService)
 
-	routes.Setup(app, userController, komporController, espController, boSeController)
+	routes.Setup(app, userController, komporController, espController, boSeController, seReController)
 
 	port := config.APPConfig.APPPort
 

@@ -18,6 +18,7 @@ func Setup(
     komporController controllers.KomporController,
     espController controllers.EspController,
     boSeController controllers.BoSeController,
+    recordController controllers.SessionRecordController,
 ) {
     err := godotenv.Load(".env")
     if err != nil {
@@ -52,4 +53,9 @@ func Setup(
     api.Get("/sessions/:public_id", boSeController.GetSessionByPublicID)
     api.Patch("/sessions/:public_id/status", boSeController.UpdateSessionStatus)
     api.Patch("/sessions/:public_id/finish", boSeController.FinishSession)
+
+    // Session record routes
+    api.Get("/sessions/:session_id/records", recordController.GetRecords)
+    api.Get("/records/:record_id", recordController.GetRecordByPubID)
+    app.Post("/sessions/:session_id/records", recordController.CreateRecord) // TEST ONLY
 }
