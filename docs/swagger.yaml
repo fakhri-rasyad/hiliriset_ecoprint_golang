@@ -56,6 +56,8 @@ definitions:
         type: string
       internal_id:
         type: integer
+      is_active:
+        type: boolean
       mac_address:
         type: string
       public_id:
@@ -73,6 +75,8 @@ definitions:
         type: string
       internal_id:
         type: integer
+      is_active:
+        type: boolean
       kompor_name:
         type: string
       public_id:
@@ -146,7 +150,7 @@ definitions:
       email:
         type: string
       password:
-        minLength: 8
+        minLength: 6
         type: string
       username:
         type: string
@@ -176,12 +180,12 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server celler server.
+  description: API untuk sistem monitoring perebusan kain ecoprint
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: Hiliriset Ecoprint API
   version: "1.0"
 paths:
   /api/v1/esps:
@@ -644,6 +648,19 @@ paths:
       summary: GetRecords
       tags:
       - SessionRecords
+  /api/v1/sessions/{session_id}/ws:
+    get:
+      description: Connect via WebSocket to monitor live telemetry for a boiling session
+      parameters:
+      - description: Public ID session
+        in: path
+        name: session_id
+        required: true
+        type: string
+      responses: {}
+      summary: WebSocket session monitor
+      tags:
+      - WebSocket
   /sessions/{session_id}/records:
     post:
       consumes:

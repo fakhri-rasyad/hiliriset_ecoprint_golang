@@ -25,6 +25,7 @@ type EspBase struct {
     MacAddress   string     `json:"mac_address"`
     DeviceStatus string     `json:"device_status"`
     UserID       *int64     `json:"user_id"`
+    IsActive     bool       `json:"is_active"`
     CreatedAt    time.Time  `json:"created_at"`
     UpdatedAt    time.Time  `json:"updated_at"`
     DeletedAt    *time.Time `json:"deleted_at"`
@@ -37,6 +38,7 @@ type EspGorm struct {
     MacAddress   string         `json:"mac_address"   db:"mac_address"   gorm:"column:mac_address;unique"`
     DeviceStatus string         `json:"device_status" db:"device_status" gorm:"column:device_status;type:device_status_enum;default:offline"`
     UserID       *int64         `json:"user_id"       db:"user_id"       gorm:"column:user_id"`
+    IsActive     bool           `json:"is_active"     db:"is_active"     gorm:"column:is_active;default:false"`
     CreatedAt    time.Time      `json:"created_at"    db:"created_at"    gorm:"column:created_at;autoCreateTime"`
     UpdatedAt    time.Time      `json:"updated_at"    db:"updated_at"    gorm:"column:updated_at;autoUpdateTime"`
     DeletedAt    gorm.DeletedAt `json:"-"             db:"deleted_at"    gorm:"column:deleted_at;index"`
@@ -55,6 +57,7 @@ func (e EspGorm) ToBase() EspBase {
         MacAddress:   e.MacAddress,
         DeviceStatus: e.DeviceStatus,
         UserID:       e.UserID,
+        IsActive:     e.IsActive,
         CreatedAt:    e.CreatedAt,
         UpdatedAt:    e.UpdatedAt,
         DeletedAt:    deletedAt,

@@ -12,6 +12,8 @@ type KomporRepository interface {
     GetKomporByPublicID(publicID uuid.UUID) (*models.KomporBase, error)
     AddKompor(req *models.KomporRequest, userID int64)(*models.KomporBase, error)
     DeleteKompor(publicID uuid.UUID) error
+    SetActive(publicID uuid.UUID, active bool) error
+    SetActiveByInternalID(internalID int64, active bool) error
 }
 
 type KomporRepositoryImpl struct{}
@@ -66,5 +68,19 @@ func (r *KomporRepositoryImpl) DeleteKompor(publicID uuid.UUID) error {
     return config.DB.
         Where("public_id = ?", publicID).
         Delete(&models.KomporGorm{}).
+        Error
+}
+
+func (r *KomporRepositoryImpl) SetActive(publicID uuid.UUID, active bool) error {
+    return config.DB.Model(&models.KomporGorm{}).
+        Where("public_id = ?", publicID).
+        Update("is_active", active).
+        Error
+}
+
+func (r *KomporRepositoryImpl) SetActiveByInternalID(internalID int64, active bool) error {
+    return config.DB.Model(&models.KomporGorm{}).
+        Where("internal_id = ?", internalID).
+        Update("is_active", active).
         Error
 }

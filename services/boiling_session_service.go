@@ -1,8 +1,11 @@
 package services
 
 import (
+	"errors"
 	"hiliriset_ecoprint_golang/models"
 	"hiliriset_ecoprint_golang/repositories"
+	"log"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -15,11 +18,21 @@ type BoSeService interface {
     FinishSession(publicID uuid.UUID) error
 }
 
+type MQTTPublisher interface {
+    Publish(topic string, payload string) error
+}
+
+type SessionTimerStarter interface {
+    StartSessionTimer(session *models.BoilingSessionBase)
+}
+
 type BoSeServiceImpl struct {
     bsRepo   repositories.BoSeRepository
     userRepo repositories.UserRepository
     krRepo   repositories.KomporRepository
     espRepo  repositories.EspRepository
+    mqttPub     MQTTPublisher       // satisfied by *MQTTClient
+    timerStarter SessionTimerStarter
 }
 
 func NewBoSeService(
@@ -27,12 +40,16 @@ func NewBoSeService(
     userRepo repositories.UserRepository,
     krRepo repositories.KomporRepository,
     espRepo repositories.EspRepository,
+    mqttPub MQTTPublisher,
+    timerStarter SessionTimerStarter,
 ) BoSeService {
     return &BoSeServiceImpl{
-        bsRepo:   bsRepo,
-        userRepo: userRepo,
-        krRepo:   krRepo,
-        espRepo:  espRepo,
+        bsRepo:       bsRepo,
+        userRepo:     userRepo,
+        krRepo:       krRepo,
+        espRepo:      espRepo,
+        mqttPub:      mqttPub,
+        timerStarter: timerStarter,
     }
 }
 
@@ -42,7 +59,6 @@ func (s *BoSeServiceImpl) CreateSession(userEmail string, req *models.BoilingSes
         return nil, err
     }
 
-    // Resolve public IDs to internal IDs
     kompor, err := s.krRepo.GetKomporByPublicID(req.KomporPublicID)
     if err != nil {
         return nil, err
@@ -53,10 +69,35 @@ func (s *BoSeServiceImpl) CreateSession(userEmail string, req *models.BoilingSes
         return nil, err
     }
 
-    base, err := s.bsRepo.CreateSession(user.InternalID, kompor.InternalID, esp.InternalID, req.FabricType)
+    // Check availability before creating
+    if kompor.IsActive {
+        return nil, errors.New("kompor sedang digunakan di sesi lain")
+    }
+    if esp.IsActive {
+        return nil, errors.New("esp sedang digunakan di sesi lain")
+    }
+
+    endTime := time.Now().Add(5 * time.Minute)
+
+    base, err := s.bsRepo.CreateSession(user.InternalID, kompor.InternalID, esp.InternalID, esp.PublicID ,req.FabricType, endTime)
     if err != nil {
         return nil, err
     }
+
+    // Mark both as active
+    if err := s.krRepo.SetActive(req.KomporPublicID, true); err != nil {
+        log.Printf("failed to set kompor active: %v", err)
+    }
+    if err := s.espRepo.SetActive(req.EspPublicID, true); err != nil {
+        log.Printf("failed to set esp active: %v", err)
+    }
+
+    topic := "esp/" + esp.PublicID.String() + "/cmd"
+    if err := s.mqttPub.Publish(topic, "start"); err != nil {
+        log.Printf("failed to publish start to esp %s: %v", esp.PublicID, err)
+    }
+
+    s.timerStarter.StartSessionTimer(base)
 
     response := base.ToResponse()
     return &response, nil
@@ -67,7 +108,6 @@ func (s *BoSeServiceImpl) GetSessionByPublicID(publicID uuid.UUID) (*models.Boil
     if err != nil {
         return nil, err
     }
-
     response := base.ToResponse()
     return &response, nil
 }
@@ -87,7 +127,6 @@ func (s *BoSeServiceImpl) GetSessions(userEmail string) ([]models.BoilingSession
     for i, base := range bases {
         responses[i] = base.ToResponse()
     }
-
     return responses, nil
 }
 

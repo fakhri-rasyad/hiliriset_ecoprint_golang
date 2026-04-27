@@ -33,6 +33,7 @@ type BoilingSessionBase struct {
     UserID        *int64     `json:"user_id"`
     KomporID      *int64     `json:"kompor_id"`
     EspID         *int64     `json:"esp_id"`
+    EspPublicID *uuid.UUID `json:"esp_public_id"`
     CreatedAt     time.Time  `json:"created_at"`
     FinishedAt    *time.Time `json:"finished_at"`
     UpdatedAt     time.Time  `json:"updated_at"`

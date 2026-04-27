@@ -1,9 +1,10 @@
 CREATE TABLE kompors
-(   
+(
     internal_id     BIGSERIAL       PRIMARY KEY,
     public_id       UUID            NOT NULL DEFAULT gen_random_uuid(),
     user_id         BIGINT,
     kompor_name     VARCHAR(32)     NOT NULL,
+    is_active       BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at      TIMESTAMPTZ     NULL,

@@ -753,6 +753,25 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/sessions/{session_id}/ws": {
+            "get": {
+                "description": "Connect via WebSocket to monitor live telemetry for a boiling session",
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "WebSocket session monitor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public ID session",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/sessions/{session_id}/records": {
             "post": {
                 "description": "Endpoint pengujian untuk simulasi data sensor dari ESP. Hapus sebelum production.",
@@ -967,6 +986,9 @@ const docTemplate = `{
                 "internal_id": {
                     "type": "integer"
                 },
+                "is_active": {
+                    "type": "boolean"
+                },
                 "mac_address": {
                     "type": "string"
                 },
@@ -992,6 +1014,9 @@ const docTemplate = `{
                 },
                 "internal_id": {
                     "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
                 },
                 "kompor_name": {
                     "type": "string"
@@ -1111,7 +1136,7 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 8
+                    "minLength": 6
                 },
                 "username": {
                     "type": "string"
@@ -1157,8 +1182,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:3000",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Swagger Example API",
-	Description:      "This is a sample server celler server.",
+	Title:            "Hiliriset Ecoprint API",
+	Description:      "API untuk sistem monitoring perebusan kain ecoprint",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

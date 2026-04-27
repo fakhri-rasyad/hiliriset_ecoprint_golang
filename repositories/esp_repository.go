@@ -12,6 +12,7 @@ type EspRepository interface {
     GetEsps(userID int64) ([]models.EspBase, error)
     GetEspByPublicID(publicID uuid.UUID) (*models.EspBase, error)
     DeleteEsp(publicID uuid.UUID) error
+    SetActive(publicID uuid.UUID, active bool) error
 }
 
 type EspRepositoryImpl struct{}
@@ -65,5 +66,12 @@ func (r *EspRepositoryImpl) DeleteEsp(publicID uuid.UUID) error {
     return config.DB.
         Where("public_id = ?", publicID).
         Delete(&models.EspGorm{}).
+        Error
+}
+
+func (r *EspRepositoryImpl) SetActive(publicID uuid.UUID, active bool) error {
+    return config.DB.Model(&models.EspGorm{}).
+        Where("public_id = ?", publicID).
+        Update("is_active", active).
         Error
 }

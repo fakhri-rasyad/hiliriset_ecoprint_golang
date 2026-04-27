@@ -27,6 +27,8 @@ type Config struct{
 	JWTSecret string
 	JWTExpireMinutes string
 	JWTRefreshToken string
+  MQTTHost string
+  MQTTPort string
 }
 
 func LoadEnv(){
@@ -43,11 +45,11 @@ func LoadEnv(){
 		JWTSecret : getEnv("JWT_SECRET", "supersecret"),
 		JWTExpireMinutes: getEnv("JWT_EXPIRY_MINUTES", "1800"),
 		JWTRefreshToken: getEnv("REFRESH_TOKEN_EXPIRED", "24h"),
+    MQTTHost: getEnv("MQTT_Host", "localhost"),
+    MQTTPort : getEnv("MQTT_Port", "1883"),
 	}
 
-
 }
-
 
 func getEnv(key, fallback string) string {
 	value, exists := os.LookupEnv(key)

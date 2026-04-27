@@ -22,7 +22,7 @@ type UserLoginResponse struct {
 type UserRegisterRequest struct {
     Username string `json:"username" validate:"required"`
     Email    string `json:"email"    validate:"required,email"`
-    Password string `json:"password" validate:"required,min=8"`
+    Password string `json:"password" validate:"required,min=6"`
 }
 
 type UserLoginRequest struct {
@@ -36,7 +36,7 @@ type UserBase struct {
     PublicID   uuid.UUID  `json:"public_id"`
     Username   string     `json:"username"`
     Email      string     `json:"email"`
-    Password   string     `json:"-"`         
+    Password   string     `json:"-"`
     Role       string     `json:"role"`
     CreatedAt  time.Time  `json:"created_at"`
     UpdatedAt  time.Time  `json:"updated_at"`
