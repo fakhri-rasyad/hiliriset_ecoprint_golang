@@ -83,7 +83,6 @@ func (s *BoSeServiceImpl) CreateSession(userEmail string, req *models.BoilingSes
         return nil, err
     }
 
-    // Mark both as active
     if err := s.krRepo.SetActive(req.KomporPublicID, true); err != nil {
         log.Printf("failed to set kompor active: %v", err)
     }
