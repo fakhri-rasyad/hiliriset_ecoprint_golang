@@ -163,10 +163,14 @@ func (h *MQTTHandler) finishSession(sessionPublicID uuid.UUID, espPublicID uuid.
     }
 
     h.srService.InvalidateSession(sessionPublicID)
+    finishCommand := &models.MQTTCommandPayload{
+          Command: "Stop",
+        }
+    payload, err := json.Marshal(finishCommand)
 
     if h.mqttPub != nil && espPublicID != uuid.Nil {
         topic := "esp/" + espPublicID.String() + "/cmd"
-        if err := h.mqttPub.Publish(topic, "stop"); err != nil {
+        if err := h.mqttPub.Publish(topic, string(payload)); err != nil {
             log.Printf("MQTT failed to publish stop to esp %s: %v", espPublicID, err)
         }
     }

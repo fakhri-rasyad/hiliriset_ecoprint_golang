@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"hiliriset_ecoprint_golang/models"
 	"hiliriset_ecoprint_golang/repositories"
@@ -91,7 +92,11 @@ func (s *BoSeServiceImpl) CreateSession(userEmail string, req *models.BoilingSes
     }
 
     topic := "esp/" + esp.PublicID.String() + "/cmd"
-    if err := s.mqttPub.Publish(topic, "start"); err != nil {
+    startCommand := &models.MQTTCommandPayload{
+      Command: "Start",
+    }
+    payload, err := json.Marshal(startCommand)
+    if err := s.mqttPub.Publish(topic, string(payload)); err != nil {
         log.Printf("failed to publish start to esp %s: %v", esp.PublicID, err)
     }
 
