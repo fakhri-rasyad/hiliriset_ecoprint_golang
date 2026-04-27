@@ -772,53 +772,6 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/sessions/{session_id}/records": {
-            "post": {
-                "description": "Endpoint pengujian untuk simulasi data sensor dari ESP. Hapus sebelum production.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SessionRecords"
-                ],
-                "summary": "[TEST ONLY] CreateRecord",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Public ID session",
-                        "name": "session_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Data sensor",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.SessionRecordInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/auth/login": {
             "post": {
                 "description": "Endpoint untuk authentikasi dan verifikasi user",
@@ -1040,23 +993,6 @@ const docTemplate = `{
             "properties": {
                 "kompor_name": {
                     "type": "string"
-                }
-            }
-        },
-        "models.SessionRecordInput": {
-            "type": "object",
-            "properties": {
-                "air_temp": {
-                    "type": "number"
-                },
-                "humidity": {
-                    "type": "number"
-                },
-                "session_pub_id": {
-                    "type": "string"
-                },
-                "water_temp": {
-                    "type": "number"
                 }
             }
         },

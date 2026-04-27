@@ -7,7 +7,7 @@ CREATE TABLE esps
   public_id UUID NOT NULL DEFAULT gen_random_uuid(),
   mac_address VARCHAR(17) NOT NULL UNIQUE,
   user_id BIGINT,
-  device_status esps_device_status NOT NULL DEFAULT 'offline',
+  device_status esps_device_status NOT NULL DEFAULT 'online',
   is_active BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

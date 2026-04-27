@@ -93,17 +93,6 @@ definitions:
     required:
     - kompor_name
     type: object
-  models.SessionRecordInput:
-    properties:
-      air_temp:
-        type: number
-      humidity:
-        type: number
-      session_pub_id:
-        type: string
-      water_temp:
-        type: number
-    type: object
   models.SessionRecordOutput:
     properties:
       air_temp:
@@ -661,38 +650,6 @@ paths:
       summary: WebSocket session monitor
       tags:
       - WebSocket
-  /sessions/{session_id}/records:
-    post:
-      consumes:
-      - application/json
-      description: Endpoint pengujian untuk simulasi data sensor dari ESP. Hapus sebelum
-        production.
-      parameters:
-      - description: Public ID session
-        in: path
-        name: session_id
-        required: true
-        type: string
-      - description: Data sensor
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/models.SessionRecordInput'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/utils.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.Response'
-      summary: '[TEST ONLY] CreateRecord'
-      tags:
-      - SessionRecords
   /v1/auth/login:
     post:
       consumes:

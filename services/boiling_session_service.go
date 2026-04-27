@@ -69,7 +69,6 @@ func (s *BoSeServiceImpl) CreateSession(userEmail string, req *models.BoilingSes
         return nil, err
     }
 
-    // Check availability before creating
     if kompor.IsActive {
         return nil, errors.New("kompor sedang digunakan di sesi lain")
     }
