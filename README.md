@@ -119,7 +119,7 @@ MQTT_PASSWORD=
 ## Running Locally
 
 1. Clone the repository
-   git clone https://github.com/yourusername/hiliriset_ecoprint_golang.git
+   git clone https://github.com/fakhri-rasyad/hiliriset_ecoprint_golang.git
    cd hiliriset_ecoprint_golang
 
 2. Install dependencies
