@@ -12,6 +12,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 
 	_ "hiliriset_ecoprint_golang/docs"
 
@@ -53,6 +54,12 @@ func main() {
         DeepLinking:       false,
         DocExpansion:      "none",
         OAuth2RedirectUrl: "http://localhost:3000/swagger/oauth2-redirect.html",
+    }))
+
+    app.Use(cors.New(cors.Config{
+      AllowOrigins: []string{"localhost:5173"},
+      AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+      AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
     }))
 
     // 3. Repositories
