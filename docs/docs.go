@@ -1014,6 +1014,9 @@ const docTemplate = `{
                 "session_id": {
                     "type": "integer"
                 },
+                "water_sufficient": {
+                    "type": "boolean"
+                },
                 "water_temp": {
                     "type": "number"
                 }

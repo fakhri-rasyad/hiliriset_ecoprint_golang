@@ -6,6 +6,7 @@ CREATE TABLE session_records
   air_temp FLOAT NOT NULL,
   water_temp FLOAT NOT NULL,
   humidity FLOAT NOT NULL,
+  water_sufficient BOOLEAN NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMPTZ NULL,
 

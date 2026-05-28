@@ -12,7 +12,6 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/cors"
 
 	_ "hiliriset_ecoprint_golang/docs"
 
@@ -48,6 +47,7 @@ func main() {
 
     // 2. Fiber app
     app := fiber.New()
+
     app.Get("/swagger/*", swaggo.HandlerDefault)
     app.Get("/docs/*", swaggo.New(swaggo.Config{
         URL:               "http://example.com/doc.json",
@@ -56,20 +56,21 @@ func main() {
         OAuth2RedirectUrl: "http://localhost:3000/swagger/oauth2-redirect.html",
     }))
 
-    app.Use(cors.New(cors.Config{
-      AllowOrigins: []string{"localhost:5173"},
-      AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-      AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-    }))
+    // app.Use(cors.New(cors.Config{
+    //     AllowOrigins: []string{os.Getenv("CORS_ORIGIN")},
+    //     AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+    //     AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+    // }))
 
     // 3. Repositories
-    userRepository  := repositories.NewUserRepository()
-    komporRepository := repositories.NewKomporRepository()
-    espRepository   := repositories.NewEspRepository()
-    boSeRepository  := repositories.NewBoSeRepository()
-    seReRepository  := repositories.NewSeReRepository()
+    userRepository        := repositories.NewUserRepository()
+    komporRepository      := repositories.NewKomporRepository()
+    espRepository         := repositories.NewEspRepository()
+    boSeRepository        := repositories.NewBoSeRepository()
+    seReRepository        := repositories.NewSeReRepository()
+    fabricTypeRepository  := repositories.NewFabricTypeRepository()  // new
 
-    // 4. WebSocket hub — needed by MQTT handler
+    // 4. WebSocket hub
     wsHub := websocketutils.NewHub()
     go wsHub.Run()
 
@@ -77,25 +78,36 @@ func main() {
     seReService := services.NewSessionRecordService(seReRepository, boSeRepository)
 
     // 6. MQTT — handler first, then client, then inject publisher back
-    mqttHandler := mqttpackage.NewMQTTHandler(boSeRepository, seReService, wsHub, espRepository, komporRepository)
-    mqttClient  := mqttpackage.NewMQTTClient(mqttHandler)
+    mqttHandler := mqttpackage.NewMQTTHandler(
+        boSeRepository,
+        seReService,
+        wsHub,
+        espRepository,
+        komporRepository,
+        fabricTypeRepository,
+    )
+    mqttClient := mqttpackage.NewMQTTClient(mqttHandler)
     mqttHandler.SetPublisher(mqttClient)
+    go mqttHandler.RecoverStaleSessions()
+
     defer mqttClient.Disconnect()
+    defer mqttHandler.Stop()  // flushes batcher on shutdown
 
     // 7. Services that depend on MQTT
-    boSeService  := services.NewBoSeService(boSeRepository, userRepository, komporRepository, espRepository, mqttClient,mqttHandler)
-    userService  := services.NewUserService(userRepository)
+    // Note: timerStarter removed — timer now starts on steaming event in MQTT handler
+    boSeService   := services.NewBoSeService(boSeRepository, userRepository, komporRepository, espRepository, fabricTypeRepository,mqttClient, mqttHandler) // pass mqttHandler as espRegistrar
+    userService   := services.NewUserService(userRepository)
     komporService := services.NewKomporService(userRepository, komporRepository)
-    espService   := services.NewEspService(espRepository, userRepository)
+    espService    := services.NewEspService(espRepository, userRepository)
 
     // 8. Controllers
-    userController  := controllers.NewUserController(userService)
+    userController   := controllers.NewUserController(userService)
     komporController := controllers.NewKomporController(komporService)
-    espController   := controllers.NewEspController(espService)
-    boSeController  := controllers.NewBoSeController(boSeService, seReService)
-    seReController  := controllers.NewSessionRecordController(seReService)
+    espController    := controllers.NewEspController(espService)
+    boSeController   := controllers.NewBoSeController(boSeService, seReService)
+    seReController   := controllers.NewSessionRecordController(seReService)
+    wsController     := websocketutils.NewWSController(wsHub)
 
-    wsController := websocketutils.NewWSController(wsHub)
     // 9. Routes
     routes.Setup(app, userController, komporController, espController, boSeController, seReController, wsController)
 

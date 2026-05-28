@@ -1,14 +1,12 @@
 CREATE TYPE boiling_status_enum AS ENUM
-('boiling', 'finished', 'cancelled');
-CREATE TYPE fabric_type_enum AS ENUM
-('katun', 'polyester', 'linen', 'sutra');
+('preparing', 'steaming', 'finished', 'cancelled');
 
 CREATE TABLE boiling_sessions
 (
     internal_id     BIGSERIAL               PRIMARY KEY,
     public_id       UUID                    NOT NULL DEFAULT gen_random_uuid(),
-    boiling_status  boiling_status_enum     NOT NULL DEFAULT 'boiling',
-    fabric_type     fabric_type_enum        NOT NULL DEFAULT 'katun',
+    boiling_status  boiling_status_enum     NOT NULL DEFAULT 'preparing',
+    fabric_type     BIGINT,
     user_id         BIGINT,
     kompor_id       BIGINT,
     esp_id          BIGINT,
@@ -20,5 +18,6 @@ CREATE TABLE boiling_sessions
     CONSTRAINT boiling_session_public_id_unique UNIQUE (public_id),
     CONSTRAINT boiling_session_fk_user_id   FOREIGN KEY (user_id)   REFERENCES users(internal_id)   ON DELETE SET NULL,
     CONSTRAINT boiling_session_fk_kompor_id FOREIGN KEY (kompor_id) REFERENCES kompors(internal_id) ON DELETE SET NULL,
-    CONSTRAINT boiling_session_fk_esp_id    FOREIGN KEY (esp_id)    REFERENCES esps(internal_id)    ON DELETE SET NULL
+    CONSTRAINT boiling_session_fk_esp_id    FOREIGN KEY (esp_id)    REFERENCES esps(internal_id)    ON DELETE SET NULL,
+    CONSTRAINT boiling_session_fk_fabric_type_id FOREIGN KEY (fabric_type) REFERENCES fabric_types(internal_id) ON DELETE SET NULL
 );

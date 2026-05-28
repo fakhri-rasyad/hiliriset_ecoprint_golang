@@ -36,7 +36,6 @@ func NewMQTTClient(handler *MQTTHandler) *MQTTClient {
 }
 
 func subscribeTopics(client paho.Client, handler *MQTTHandler) {
-    // Wildcard — catches all ESPs: esp/any-public-id/telemetry
     token := client.Subscribe("esp/+/telemetry", 1, handler.handleTelemetry)
     token.Wait()
     if token.Error() != nil {

@@ -16,7 +16,7 @@ type BoilingSessionCreation struct {
 type BoilingSessionResponse struct {
     PublicID      uuid.UUID  `json:"public_id"`
     BoilingStatus string     `json:"boiling_status"`
-    FabricType    string     `json:"fabric_type"`
+    FabricType    int64     `json:"fabric_type"`
     UserID        *int64     `json:"user_id"`
     KomporID      *int64     `json:"kompor_id"`
     EspID         *int64     `json:"esp_id"`
@@ -29,7 +29,7 @@ type BoilingSessionBase struct {
     InternalID    int64      `json:"internal_id"`
     PublicID      uuid.UUID  `json:"public_id"`
     BoilingStatus string     `json:"boiling_status"`
-    FabricType    string     `json:"fabric_type"`
+    FabricType    int64     `json:"fabric_type"`
     UserID        *int64     `json:"user_id"`
     KomporID      *int64     `json:"kompor_id"`
     EspID         *int64     `json:"esp_id"`
@@ -60,8 +60,8 @@ type BoilingSessionStatusUpdate struct {
 type BoilingSession struct {
     InternalID    int64      `json:"internal_id"    db:"internal_id"    gorm:"column:internal_id;primaryKey;autoIncrement"`
     PublicID      uuid.UUID  `json:"public_id"      db:"public_id"      gorm:"column:public_id;unique;type:uuid"`
-    BoilingStatus string     `json:"boiling_status" db:"boiling_status" gorm:"column:boiling_status;type:boiling_status_enum;default:boiling"`
-    FabricType    string     `json:"fabric_type"    db:"fabric_type"    gorm:"column:fabric_type;type:fabric_type_enum;default:katun"`
+    BoilingStatus string     `json:"boiling_status" db:"boiling_status" gorm:"column:boiling_status;type:boiling_status_enum;default:preparing"`
+    FabricType    int64      `json:"fabric_type"    db:"fabric_type"    gorm:"column:fabric_type"`
     UserID        *int64     `json:"user_id"        db:"user_id"        gorm:"column:user_id"`
     KomporID      *int64     `json:"kompor_id"      db:"kompor_id"      gorm:"column:kompor_id"`
     EspID         *int64     `json:"esp_id"         db:"esp_id"         gorm:"column:esp_id"`
