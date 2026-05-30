@@ -8,10 +8,12 @@ import (
 	"hiliriset_ecoprint_golang/routes"
 	"hiliriset_ecoprint_golang/services"
 	websocketutils "hiliriset_ecoprint_golang/websocket_utils"
+	"os"
 
 	"log"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 
 	_ "hiliriset_ecoprint_golang/docs"
 
@@ -56,11 +58,11 @@ func main() {
         OAuth2RedirectUrl: "http://localhost:3000/swagger/oauth2-redirect.html",
     }))
 
-    // app.Use(cors.New(cors.Config{
-    //     AllowOrigins: []string{os.Getenv("CORS_ORIGIN")},
-    //     AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
-    //     AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-    // }))
+    app.Use(cors.New(cors.Config{
+        AllowOrigins: []string{os.Getenv("CORS_ORIGIN")},
+        AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
+        AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+    }))
 
     // 3. Repositories
     userRepository        := repositories.NewUserRepository()
@@ -99,6 +101,7 @@ func main() {
     userService   := services.NewUserService(userRepository)
     komporService := services.NewKomporService(userRepository, komporRepository)
     espService    := services.NewEspService(espRepository, userRepository)
+    fabricTypeService := services.NewFabricTypeService(fabricTypeRepository)
 
     // 8. Controllers
     userController   := controllers.NewUserController(userService)
@@ -106,10 +109,12 @@ func main() {
     espController    := controllers.NewEspController(espService)
     boSeController   := controllers.NewBoSeController(boSeService, seReService)
     seReController   := controllers.NewSessionRecordController(seReService)
+    fabricTypeController := controllers.NewFabricTypeController(fabricTypeService)
     wsController     := websocketutils.NewWSController(wsHub)
 
+
     // 9. Routes
-    routes.Setup(app, userController, komporController, espController, boSeController, seReController, wsController)
+    routes.Setup(app, userController, komporController, espController, boSeController, seReController, fabricTypeController ,wsController)
 
     port := config.APPConfig.APPPort
     log.Print("App running on port: ", port)

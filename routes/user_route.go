@@ -22,6 +22,7 @@ func Setup(
     espController controllers.EspController,
     boSeController controllers.BoSeController,
     recordController controllers.SessionRecordController,
+    fabricTypeController controllers.FabricTypeController,
     wsController *websocketutils.WSController,
 ) {
     err := godotenv.Load(".env")
@@ -66,5 +67,8 @@ func Setup(
 
     api.Get("/sessions/:session_id/records", recordController.GetRecords)
     api.Get("/records/:record_id", recordController.GetRecordByPubID)
+
+    api.Get("/fabric_types/:fabric_uuid", fabricTypeController.GetFabricByUUID)
+    api.Get("fabric_types/", fabricTypeController.GetFabricAll)
 
 }

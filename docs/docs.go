@@ -203,6 +203,80 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/fabric_types": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil daftar kain",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fabrics"
+                ],
+                "summary": "GetFabricAll",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.FabricType"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/fabric_types/{fabric_uuid}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Mengambil informasi kain berdasarkan id public",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Fabrics"
+                ],
+                "summary": "GetFabricByUUID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public id kain",
+                        "name": "fabric_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.FabricType"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/kompors": {
             "get": {
                 "security": [
@@ -886,7 +960,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "fabric_type": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "finished_at": {
                     "type": "string"
@@ -953,6 +1027,29 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.FabricType": {
+            "type": "object",
+            "properties": {
+                "boiling_minutes": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "internal_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "public_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

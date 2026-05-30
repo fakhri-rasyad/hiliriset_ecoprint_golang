@@ -70,14 +70,25 @@ func (r *BoSeRepositoryImpl) GetSessions(userID int64) ([]models.BoilingSessionB
 }
 
 func (r *BoSeRepositoryImpl) GetSessionByPublicID(publicID uuid.UUID) (*models.BoilingSessionBase, error) {
-    var gormModel models.BoilingSession
+	var gormModel models.BoilingSession
 
-    if err := config.DB.Where("public_id = ?", publicID).First(&gormModel).Error; err != nil {
-        return nil, err
-    }
+	if err := config.DB.Where("public_id = ?", publicID).First(&gormModel).Error; err != nil {
+		return nil, err
+	}
 
-    base := gormModel.ToBase()
-    return &base, nil
+	base := gormModel.ToBase()
+
+	if gormModel.EspID != nil {
+		var esp models.EspGorm
+		if err := config.DB.
+			Select("public_id").
+			Where("internal_id = ?", *gormModel.EspID).
+			First(&esp).Error; err == nil {
+			base.EspPublicID = &esp.PublicID
+		}
+	}
+
+	return &base, nil
 }
 
 func (r *BoSeRepositoryImpl) UpdateSessionStatus(publicID uuid.UUID, status string) error {
@@ -116,35 +127,49 @@ func (r *BoSeRepositoryImpl) FinishSession(publicID uuid.UUID) error {
 }
 
 func (r *BoSeRepositoryImpl) GetActiveSessionByEspPublicID(espPublicID uuid.UUID) (*models.BoilingSessionBase, error) {
-    var gormModel models.BoilingSession
+	var gormModel models.BoilingSession
 
-    err := config.DB.
-        Joins("JOIN esps ON esps.internal_id = boiling_sessions.esp_id").
-        Where("esps.public_id = ? AND (boiling_sessions.boiling_status = ? OR boiling_sessions.boiling_status = ?)", espPublicID, "steaming", "preparing").
-        First(&gormModel).Error
+	err := config.DB.
+		Joins("JOIN esps ON esps.internal_id = boiling_sessions.esp_id").
+		Where("esps.public_id = ? AND (boiling_sessions.boiling_status = ? OR boiling_sessions.boiling_status = ?)",
+			espPublicID, "steaming", "preparing").
+		First(&gormModel).Error
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    base := gormModel.ToBase()
-    return &base, nil
+	base := gormModel.ToBase()
+	base.EspPublicID = &espPublicID
+	return &base, nil
 }
 
 func (r *BoSeRepositoryImpl) GetActiveSessions() ([]models.BoilingSessionBase, error) {
-    var gormModels []models.BoilingSession
+	var gormModels []models.BoilingSession
 
-    err := config.DB.
-        Where("boiling_status IN ?", []string{"preparing", "steaming"}).
-        Find(&gormModels).Error
+	err := config.DB.
+		Where("boiling_status IN ?", []string{"preparing", "steaming"}).
+		Find(&gormModels).Error
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    result := make([]models.BoilingSessionBase, len(gormModels))
-    for i, g := range gormModels {
-        result[i] = g.ToBase()
-    }
-    return result, nil
+	result := make([]models.BoilingSessionBase, len(gormModels))
+	for i, g := range gormModels {
+		base := g.ToBase()
+
+		if g.EspID != nil {
+			var esp models.EspGorm
+			if err := config.DB.
+				Select("public_id").
+				Where("internal_id = ?", *g.EspID).
+				First(&esp).Error; err == nil {
+				base.EspPublicID = &esp.PublicID
+			}
+		}
+
+		result[i] = base
+	}
+	return result, nil
 }
