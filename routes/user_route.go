@@ -1,4 +1,3 @@
-// routes/routes.go — fix test route prefix and WSController type
 package routes
 
 import (
